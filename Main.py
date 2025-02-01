@@ -71,52 +71,52 @@ def setSourcePath():
 def setTargetPath():
     try:
         global targetPath
-        tempTargetPath = tkinter.filedialog.askdirectory(title = "목적지 경로 선택")
+        tempTargetPath = tkinter.filedialog.askdirectory(title = "도착지 경로 선택")
         if tempTargetPath != "":
             targetPath = tempTargetPath
-            setMessageLog(f"[성공] 목적지 경로를 '{targetPath}'(으)로 설정하였습니다.")
+            setMessageLog(f"[성공] 도착지 경로를 '{targetPath}'(으)로 설정하였습니다.")
             entryTargetPath.config(state='normal')
             entryTargetPath.delete(0, tkinter.END)
             entryTargetPath.insert(0, targetPath)
             entryTargetPath.config(state='readonly')
             return
         else: # 경로 재설정을 취소하는 경우
-            setMessageLog(f"[성공] 목적지 경로 재설정을 취소하였습니다.")
+            setMessageLog(f"[성공] 도착지 경로 재설정을 취소하였습니다.")
             return
     except Exception as e:
-        setMessageBox("error", "오류 발생", f"목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
-        setMessageLog(f"[오류] 목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
+        setMessageBox("error", "오류 발생", f"도착지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
+        setMessageLog(f"[오류] 도착지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
         return sys.exit()
 
 def applyPath():
     try:
         if sourcePath == "" or targetPath == "": # 빈 공백
-            setMessageBox('warning', "경로가 설정되지 않음", "출발지 경로 혹은 목적지 경로가 설정되지 않았습니다.")
-            setMessageLog(f"[경고] 출발지 경로 혹은 목적지 경로가 설정되지 않았습니다.")
+            setMessageBox('warning', "경로가 설정되지 않음", "출발지 경로 혹은 도착지 경로가 설정되지 않았습니다.")
+            setMessageLog(f"[경고] 출발지 경로 혹은 도착지 경로가 설정되지 않았습니다.")
         elif sourcePath[-2:] == ':/' or targetPath[-2:] == ':/': # 파티션 별 루트 디렉토리는 접근 거부로 인해 설정 불가능
-            setMessageBox("warning", "루트 디렉토리 설정 불가", "루트 디렉토리는 출발지 혹은 목적지 경로로 설정이 불가능합니다. 루트 디렉토리에 폴더를 생성하여 경로를 우회하거나, 다른 경로를 선택해주세요.")
-            setMessageLog(f"[경고] 루트 디렉토리는 출발지 혹은 목적지 경로로 설정이 불가능합니다.")
+            setMessageBox("warning", "루트 디렉토리 설정 불가", "루트 디렉토리는 출발지 혹은 도착지 경로로 설정이 불가능합니다. 루트 디렉토리에 폴더를 생성하여 경로를 우회하거나, 다른 경로를 선택해주세요.")
+            setMessageLog(f"[경고] 루트 디렉토리는 출발지 혹은 도착지 경로로 설정이 불가능합니다.")
         elif sourcePath == targetPath:
-            setMessageBox("warning", "출발지 경로와 목적지 경로가 같음", "출발지 경로와 목적지 경로가 같습니다. 둘 중 하나는 다른 경로를 선택해주세요.")
-            setMessageLog(f"[경고] 출발지 경로와 목적지 경로가 같습니다.")
+            setMessageBox("warning", "출발지 경로와 도착지 경로가 같음", "출발지 경로와 도착지 경로가 같습니다. 둘 중 하나는 다른 경로를 선택해주세요.")
+            setMessageLog(f"[경고] 출발지 경로와 도착지 경로가 같습니다.")
         else:
             dat = open(f"{absPath}/Path.dat", 'w')
             dat.write(f"{sourcePath}\n{targetPath}")
             dat.close()
-            setMessageBox("info", "경로 적용 완료", "출발지 및 목적지 경로를 정상적으로 적용하였습니다.")
-            setMessageLog(f"[성공] 출발지 경로 '{sourcePath}' 목적지 경로 '{targetPath}'를 정상적으로 적용하였습니다.")
+            setMessageBox("info", "경로 적용 완료", "출발지 및 도착지 경로를 정상적으로 적용하였습니다.")
+            setMessageLog(f"[성공] 출발지 경로 '{sourcePath}' 도착지 경로 '{targetPath}'를 정상적으로 적용하였습니다.")
             return
     except Exception as e:
-        setMessageBox("error", "오류 발생", f"출발지 및 목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
-        setMessageLog(f"[오류] '출발지 및 목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
+        setMessageBox("error", "오류 발생", f"출발지 및 도착지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
+        setMessageLog(f"[오류] '출발지 및 도착지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
         return sys.exit()
 
 
 # Sync ───────────────────────────────────────────────────────────────
 def startSync():
     if sourcePath == '' or targetPath == '':
-        setMessageBox("warning", "경로가 설정되지 않음", "출발지 경로 혹은 목적지 경로가 입력되지 않았습니다.")
-        setMessageLog(f"[경고] 출발지 경로 혹은 목적지 경로가 입력되지 않았습니다.")
+        setMessageBox("warning", "경로가 설정되지 않음", "출발지 경로 혹은 도착지 경로가 입력되지 않았습니다.")
+        setMessageLog(f"[경고] 출발지 경로 혹은 도착지 경로가 입력되지 않았습니다.")
     else:
         root.title("갈무리 프로젝트 (동기화 중...)")
         syncCore(sourcePath, targetPath) # 코어 함수 사용. GUI의 데몬 스레드로 사용하진 않을 예정 (레이스 컨디션 예방)
@@ -136,19 +136,19 @@ def syncCore(sourcePath, targetPath):
             sync(sourcePath, targetPath, 'sync')
             buttonPath = [
                 {'activationType': 'protocol', 'arguments': f"{sourcePath}", 'content': "출발지 폴더"},
-                {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "목적지 폴더"}
+                {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "도착지 폴더"}
             ]
             setMessageLog(f"[성공] 동기화가 완료되었습니다. {sourcePath} -> {targetPath}")
-            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
+            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 도착지 폴더를 확인해보세요.", buttons = buttonPath)
         else:
             sync(sourcePath, targetPath, 'sync', purge=True, twoway=True)
             sync(targetPath, sourcePath, 'sync', purge=True, twoway=True)
             buttonPath = [
                 {'activationType': 'protocol', 'arguments': f"{sourcePath}", 'content': "출발지 폴더"},
-                {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "목적지 폴더"}
+                {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "도착지 폴더"}
             ]
             setMessageLog(f"[성공] 동기화가 완료되었습니다. {sourcePath} -> {targetPath}")
-            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
+            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 도착지 폴더를 확인해보세요.", buttons = buttonPath)
     except Exception as e:
         setMessageBox("error", "오류 발생", f"파일 동기화 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
         setMessageLog(f"[오류] 파일 동기화 중에 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
@@ -214,7 +214,7 @@ labelFrameSourcePath = tkinter.LabelFrame(root, text="출발지 경로", bd=0,
 entrySourcePath = tkinter.Entry(labelFrameSourcePath, width=50, state='readonly', textvariable=entryValue_sourcePath,
                             relief='solid', borderwidth=1, background='#ffffff', font=entryFont)
 
-labelFrameTargetPath = tkinter.LabelFrame(root, text="목적지 경로", bd=0,
+labelFrameTargetPath = tkinter.LabelFrame(root, text="도착지 경로", bd=0,
                                           relief='solid', background='#ffffff', font=labelFont)
 entryTargetPath = tkinter.Entry(labelFrameTargetPath, width=50, state='readonly', textvariable=entryValue_targetPath,
                             relief='solid', borderwidth=1, background='#ffffff', font=entryFont)
