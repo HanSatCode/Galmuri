@@ -10,7 +10,7 @@ import tkinter.ttk
 import tkinter.font
 import tkinter.filedialog
 import tkinter.messagebox
-from win11toast import toast
+from win11toast import notify
 from datetime import datetime
 
 
@@ -35,6 +35,7 @@ def setMessageLog(description): # 설명 파라미터를 받아서 기록함
     log.write(f"{now.strftime("%Y-%m-%d %H:%M:%S")} : {description}\n")
     return log.close()
 
+
 # GUI : Alert ───────────────────────────────────────────────────────────────
 
 def setMessageBox(type, title, description):
@@ -45,17 +46,22 @@ def setMessageBox(type, title, description):
     else: # type == "info"
         return tkinter.messagebox.showinfo(title, description)
 
+
 # Set Path ───────────────────────────────────────────────────────────────
 def setSourcePath():
     try:
         global sourcePath # 상단에 있는 '전역변수 sourcePath' 또한 적용하기 위함
-        sourcePath = tkinter.filedialog.askdirectory(title = "출발지 경로 선택")
-        if sourcePath != "":
+        tempSourcePath = tkinter.filedialog.askdirectory(title = "출발지 경로 선택")
+        if tempSourcePath != "":
+            sourcePath = tempSourcePath
             setMessageLog(f"[성공] 출발지 경로를 '{sourcePath}'(으)로 설정하였습니다.")
             entrySourcePath.config(state='normal')
             entrySourcePath.delete(0, tkinter.END)
             entrySourcePath.insert(0, sourcePath)
             entrySourcePath.config(state='readonly')
+            return
+        else: # 경로 재설정을 취소하는 경우
+            setMessageLog(f"[성공] 출발지 경로 재설정을 취소하였습니다.")
             return
     except Exception as e:
         setMessageBox("error", "오류 발생", f"출발지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {print(e)}")
@@ -65,13 +71,17 @@ def setSourcePath():
 def setTargetPath():
     try:
         global targetPath
-        targetPath = tkinter.filedialog.askdirectory(title = "목적지 경로 선택")
-        if targetPath != "":
+        tempTargetPath = tkinter.filedialog.askdirectory(title = "목적지 경로 선택")
+        if tempTargetPath != "":
+            targetPath = tempTargetPath
             setMessageLog(f"[성공] 목적지 경로를 '{targetPath}'(으)로 설정하였습니다.")
             entryTargetPath.config(state='normal')
             entryTargetPath.delete(0, tkinter.END)
             entryTargetPath.insert(0, targetPath)
             entryTargetPath.config(state='readonly')
+            return
+        else: # 경로 재설정을 취소하는 경우
+            setMessageLog(f"[성공] 목적지 경로 재설정을 취소하였습니다.")
             return
     except Exception as e:
         setMessageBox("error", "오류 발생", f"목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
@@ -101,7 +111,8 @@ def applyPath():
         setMessageLog(f"[오류] '출발지 및 목적지 경로를 설정하는 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
         return sys.exit()
 
-# Sync Passive ───────────────────────────────────────────────────────────────
+
+# Sync ───────────────────────────────────────────────────────────────
 def startSync():
     if sourcePath == '' or targetPath == '':
         setMessageBox("warning", "경로가 설정되지 않음", "출발지 경로 혹은 목적지 경로가 입력되지 않았습니다.")
@@ -112,6 +123,13 @@ def startSync():
         root.title("갈무리 프로젝트")
         return
 
+def syncCount(sourcePath, targetPath):
+    sourceList = set(os.listdir(sourcePath)) # 디렉토리의 파일 목록을 가져옴
+    targetList = set(os.listdir(targetPath))
+    common = sourceList.intersection(targetList) # 두 디렉토리에서 공통된 파일의 개수를 가져옴
+    syncCnt = len(sourceList - common) + len(targetList - common) # 동기화할 파일의 개수를 계산함
+    return syncCnt
+
 def syncCore(sourcePath, targetPath):
     try:
         if os.listdir(targetPath) == []: # 새로운(빈) 폴더일 때
@@ -121,7 +139,7 @@ def syncCore(sourcePath, targetPath):
                 {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "목적지 폴더"}
             ]
             setMessageLog(f"[성공] 동기화가 완료되었습니다. {sourcePath} -> {targetPath}")
-            return toast("갈무리 프로젝트", f"동기화가 완료되었습니다.\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
+            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
         else:
             sync(sourcePath, targetPath, 'sync', purge=True, twoway=True)
             sync(targetPath, sourcePath, 'sync', purge=True, twoway=True)
@@ -130,7 +148,7 @@ def syncCore(sourcePath, targetPath):
                 {'activationType': 'protocol', 'arguments': f"{targetPath}", 'content': "목적지 폴더"}
             ]
             setMessageLog(f"[성공] 동기화가 완료되었습니다. {sourcePath} -> {targetPath}")
-            return toast("갈무리 프로젝트", f"동기화가 완료되었습니다.\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
+            return notify("갈무리 프로젝트", f"동기화가 완료되었습니다!\n출발지 혹은 목적지 폴더를 확인해보세요.", buttons = buttonPath)
     except Exception as e:
         setMessageBox("error", "오류 발생", f"파일 동기화 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
         setMessageLog(f"[오류] 파일 동기화 중에 중에 예상치 못한 오류가 발생하였습니다. 프로그램을 종료합니다. : {e}")
@@ -182,11 +200,13 @@ entryValue_targetPath.set(targetPath)
 checkButtonValue_syncAuto = tkinter.IntVar()
 checkButtonValue_syncAuto.set(autoStatus)
 
+
 # GUI - Font ───────────────────────────────────────────────────────────────
 checkButtonFont = tkinter.font.Font(family="Pretendard", size=10)
 labelFont = tkinter.font.Font(family="Pretendard", size=12, weight='bold')
 entryFont = tkinter.font.Font(family="Pretendard", size=14)
 buttonFont = tkinter.font.Font(family="Pretendard", size=12)
+
 
 # GUI - Elements ───────────────────────────────────────────────────────────────
 labelFrameSourcePath = tkinter.LabelFrame(root, text="출발지 경로", bd=0, 
@@ -229,13 +249,14 @@ buttonSyncStart = tkinter.Button(root, text="동기화 시작", command=startSyn
                                     font=buttonFont,
                                     activebackground='#ffac26', activeforeground='#ffffff')
 
-checkButtonSyncAuto = tkinter.Checkbutton(root, text="윈도우를 시작할 때마다 자동으로 동기화",
+checkButtonSyncAuto = tkinter.Checkbutton(root, text="Windows(을)를 시작할 때마다 자동으로 동기화",
                                             command=syncSet, variable=checkButtonValue_syncAuto,
                                             relief='solid', overrelief='solid',
                                             bd=0, bg='#ffffff', fg='#000000',
                                             compound='bottom',
                                             font=checkButtonFont,
                                             activebackground='#ffffff', activeforeground='#ffac26')
+
 
 # GUI - Place ───────────────────────────────────────────────────────────────
 labelFrameSourcePath.pack(side='top', padx=10, pady=5)
@@ -248,6 +269,7 @@ buttonSourcePath.pack(side='left', padx=15, pady=5)
 buttonTargetPath.pack(side='left', padx=15, pady=5)
 buttonSyncStart.pack(side='right', padx=15, pady=5)
 buttonApplyPath.pack(side='right', padx=15, pady=5)
+
 
 # GUI - Run ───────────────────────────────────────────────────────────────
 root.mainloop()
