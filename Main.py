@@ -23,16 +23,15 @@ sourcePath = temp[0].rstrip()
 targetPath = temp[1].rstrip()
 path.close()
 
-config = open(f"{absPath}/Config.dat", 'r', encoding='UTF-8') # Config.dat에 저장된 정보를 불러옴 (다른 것으로 대체할 수 있지 않을까..?)
+config = open(f"{absPath}/Config.dat", 'r', encoding='UTF-8') # Config.dat에 저장된 정보를 불러옴
 autoStatus = config.readline().rstrip()
 config.close()
-
 
 # Log Writer ───────────────────────────────────────────────────────────────
 def setMessageLog(description): # 설명 파라미터를 받아서 기록함
     log = open(f"{absPath}/log.txt", 'a', encoding='UTF-8')
     now = datetime.now()
-    log.write(f"{now.strftime("%Y-%m-%d %H:%M:%S")} : {description}\n")
+    log.write(f"{now.strftime('%Y-%m-%d %H:%M:%S')} : {description}\n")
     return log.close()
 
 
@@ -97,7 +96,7 @@ def applyPath():
             setMessageBox("warning", "루트 디렉토리 설정 불가", "루트 디렉토리는 출발지 혹은 도착지 경로로 설정이 불가능합니다. 루트 디렉토리에 폴더를 생성하여 경로를 우회하거나, 다른 경로를 선택해주세요.")
             setMessageLog(f"[경고] 루트 디렉토리는 출발지 혹은 도착지 경로로 설정이 불가능합니다.")
         elif sourcePath == targetPath:
-            setMessageBox("warning", "출발지 경로와 도착지 경로가 같음", "출발지 경로와 도착지 경로가 같습니다. 둘 중 하나는 다른 경로를 선택해주세요.")
+            setMessageBox("warning", "출발지 경로와 도착지 경로가 같음", "출발지 경로와 도착지 경로가 같습니다.\n둘 중 하나는 다른 경로를 선택해주세요.")
             setMessageLog(f"[경고] 출발지 경로와 도착지 경로가 같습니다.")
         else:
             dat = open(f"{absPath}/Path.dat", 'w')
@@ -118,10 +117,12 @@ def startSync():
         setMessageBox("warning", "경로가 설정되지 않음", "출발지 경로 혹은 도착지 경로가 입력되지 않았습니다.")
         setMessageLog(f"[경고] 출발지 경로 혹은 도착지 경로가 입력되지 않았습니다.")
     else:
-        root.title("갈무리 프로젝트 (동기화 중...)")
-        syncCore(sourcePath, targetPath) # 코어 함수 사용. GUI의 데몬 스레드로 사용하진 않을 예정 (레이스 컨디션 예방)
-        root.title("갈무리 프로젝트")
-        return
+        checkYesNo = tkinter.messagebox.askyesno("동기화 시작 경고", "동기화로 인해 삭제된 데이터는 복구하실 수 없습니다!\n작업을 계속하시겠습니까?")
+        if checkYesNo:
+            root.title("갈무리 프로젝트 (동기화 중...)")
+            syncCore(sourcePath, targetPath) # 코어 함수 사용. GUI의 데몬 스레드로 사용하진 않을 예정 (레이스 컨디션 예방)
+            root.title("갈무리 프로젝트")
+            return
 
 def syncCount(sourcePath, targetPath):
     sourceList = set(os.listdir(sourcePath)) # 디렉토리의 파일 목록을 가져옴
